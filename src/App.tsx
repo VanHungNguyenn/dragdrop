@@ -1,7 +1,10 @@
 import {
   type Edge,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-import { createContext, useContext, useState } from 'react';
+import { Button, Stack, Text } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react/box';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { BiArea } from 'react-icons/bi';
 import invariant from 'tiny-invariant';
 
 type ItemPosition = 'first' | 'last' | 'middle' | 'only'
@@ -143,6 +146,17 @@ type ListState = {
   } | null;
 }
 
+const ListItem = ({ item, index, position }: { item: Item, index: number, position: ItemPosition }) => {
+  return <Box display='flex' alignItems='center' gap={2} p={3} border='1px solid black' borderRadius='sm'>
+    <Button size='sm'>
+      <BiArea />
+    </Button>
+    <Text>
+      {item.label}
+    </Text>
+  </Box>
+}
+
 function App() {
   const [{ items, lastCardMoved }, setListState] = useState<ListState>({
     items: defaultItems,
@@ -154,19 +168,27 @@ function App() {
   const [instanceId] = useState(() => Symbol('instance-id'))
   console.log(instanceId)
 
-  return <ListContext.Provider value={contextValue}>
-    <div>
+  const getListLength = useCallback(() => items.length, [items.length]);
 
-      {items.map((item, index) => {
-        return <ListItem
-          key={item.id}
-          item={item}
-          index={index}
-          position={getItemPosition({ index, items })}
-        />
-      })}
-    </div>
-  </ListContext.Provider>
+  // const contextValue: ListContextValue = useMemo(() => {
+  //   return {
+  //     registerItem: registry.register,
+  //     reorderItem,
+  //     instanceId,
+  //     getListLength,
+  //   };
+  // }, [registry.register, reorderItem, instanceId, getListLength]);
+
+  return <Stack gap={0} w={600} p={10}>
+    {items.map((item, index) => (
+      <ListItem
+        key={item.id}
+        item={item}
+        index={index}
+        position={getItemPosition({ index, items })}
+      />
+    ))}
+  </Stack>
 }
 
 export default App
